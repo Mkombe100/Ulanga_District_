@@ -926,7 +926,10 @@
 
         <p class="welcome-text">
           Welcome,
-          <strong>{{ user.first_name or "Farmer" }} {{ user.last_name or "" }}</strong>
+          <strong>
+            {{ session.get("first_name", "Farmer") }}
+            {{ session.get("last_name", "") }}
+          </strong>
         </p>
       </div>
 
@@ -947,10 +950,13 @@
 
               <div>
                 <div class="profile-name">
-                  {{ user.first_name or "Farmer" }} {{ user.last_name or "" }}
+                  {{ session.get("first_name", "Farmer") }}
+                  {{ session.get("last_name", "") }}
                 </div>
 
-                <div class="profile-email">{{ user.email }}</div>
+                <div class="profile-email">
+                  {{ session.get("email", "") }}
+                </div>
               </div>
             </div>
 
@@ -1069,7 +1075,10 @@
 
           <article class="feature-card">
             <h2><i class="fas fa-seedling"></i> Add Crop Plan</h2>
-            <p>Add a crop such as maize, rice, beans, tomatoes, vegetables, or fruits.</p>
+            <p>
+              Add a crop such as maize, rice, beans, tomatoes,
+              vegetables, or fruits.
+            </p>
 
             <button class="main-button" onclick="openCropModal()">
               <i class="fas fa-plus"></i>
@@ -1087,7 +1096,10 @@
 
           <article class="feature-card">
             <h2><i class="fas fa-cow"></i> Add Livestock Record</h2>
-            <p>Register cattle, goats, sheep, chickens, pigs, fish, or other animals.</p>
+            <p>
+              Register cattle, goats, sheep, chickens, pigs, fish,
+              or other animals.
+            </p>
 
             <button class="main-button" onclick="openLivestockModal()">
               <i class="fas fa-plus"></i>
@@ -1100,15 +1112,22 @@
         <section class="section" id="weatherSection">
           <div class="heading">
             <h2>Weather & Alerts</h2>
-            <p>Weather information can help you plan irrigation, planting, spraying, and harvesting.</p>
+            <p>
+              Weather information can help you plan irrigation,
+              planting, spraying, and harvesting.
+            </p>
           </div>
 
           <article class="feature-card">
             <h2><i class="fas fa-cloud-sun-rain"></i> Farm Weather</h2>
-            <p>Connect a weather API later to show live rainfall, temperature, humidity, and wind conditions.</p>
+            <p>
+              Connect a weather API later to show live rainfall,
+              temperature, humidity, and wind conditions.
+            </p>
 
-            <button class="main-button"
-                    onclick="showToast('Connect a weather API later for live weather information.')">
+            <button
+              class="main-button"
+              onclick="showToast('Connect a weather API later for live weather information.')">
               <i class="fas fa-cloud"></i>
               Check Weather
             </button>
@@ -1119,12 +1138,18 @@
         <section class="section" id="marketSection">
           <div class="heading">
             <h2>Farm Marketplace</h2>
-            <p>Create product listings for farm products, livestock, seeds, and other inputs.</p>
+            <p>
+              Create product listings for farm products,
+              livestock, seeds, and other inputs.
+            </p>
           </div>
 
           <article class="feature-card">
             <h2><i class="fas fa-store"></i> Sell a Farm Product</h2>
-            <p>Add a product such as maize, vegetables, fruits, eggs, milk, livestock, or seeds.</p>
+            <p>
+              Add a product such as maize, vegetables, fruits,
+              eggs, milk, livestock, or seeds.
+            </p>
 
             <button class="main-button" onclick="openMarketModal()">
               <i class="fas fa-plus"></i>
@@ -1137,12 +1162,17 @@
         <section class="section" id="groupsSection">
           <div class="heading">
             <h2>Farmer Groups</h2>
-            <p>Create a farmer group and share its code with other farmers.</p>
+            <p>
+              Create a farmer group and share its code with other farmers.
+            </p>
           </div>
 
           <article class="feature-card">
             <h2><i class="fas fa-users"></i> Create Farmer Group</h2>
-            <p>Create groups such as maize farmers, livestock keepers, vegetable growers, or cooperatives.</p>
+            <p>
+              Create groups such as maize farmers, livestock keepers,
+              vegetable growers, or cooperatives.
+            </p>
 
             <button class="main-button" onclick="openCreateGroupModal()">
               <i class="fas fa-plus"></i>
@@ -1186,8 +1216,13 @@
   <div class="toast" id="toast"></div>
 
   <script>
-    const userFirstName = {{ (user.first_name or "Farmer")|tojson }};
-    const userLastName = {{ (user.last_name or "")|tojson }};
+    /*
+     * FIX:
+     * The Flask route does not pass a "user" object to this template.
+     * The logged-in user's information is stored in the Flask session.
+     */
+    const userFirstName = {{ session.get("first_name", "Farmer")|tojson }};
+    const userLastName = {{ session.get("last_name", "")|tojson }};
 
     const sidebar = document.getElementById("sidebar");
     const profileButton = document.getElementById("profileButton");
@@ -1220,7 +1255,10 @@
 
     function showSection(sectionId) {
       document.querySelectorAll(".section").forEach(section => {
-        section.classList.toggle("active", section.id === sectionId);
+        section.classList.toggle(
+          "active",
+          section.id === sectionId
+        );
       });
 
       document.querySelectorAll(".nav-button").forEach(button => {
@@ -1239,6 +1277,7 @@
         : "Agriculture Dashboard";
 
       document.getElementById("pageTitle").textContent = name;
+
       document.getElementById("pageDescription").textContent =
         descriptions[sectionId];
 
@@ -1262,13 +1301,17 @@
       });
     });
 
-    document.getElementById("mobileMenuButton").addEventListener("click", () => {
-      sidebar.classList.toggle("open");
-    });
+    document
+      .getElementById("mobileMenuButton")
+      .addEventListener("click", () => {
+        sidebar.classList.toggle("open");
+      });
 
-    document.getElementById("desktopMenuButton").addEventListener("click", () => {
-      sidebar.classList.toggle("open");
-    });
+    document
+      .getElementById("desktopMenuButton")
+      .addEventListener("click", () => {
+        sidebar.classList.toggle("open");
+      });
 
     profileButton.addEventListener("click", event => {
       event.stopPropagation();
@@ -1290,7 +1333,9 @@
     }
 
     function loadTheme() {
-      const theme = localStorage.getItem("agroFarmTheme") || "light";
+      const theme =
+        localStorage.getItem("agroFarmTheme") || "light";
+
       const isDark = theme === "dark";
 
       document.body.classList.toggle("dark", isDark);
@@ -1299,43 +1344,54 @@
         isDark ? "Light Mode" : "Dark Mode";
     }
 
-    document.getElementById("themeButton").addEventListener("click", () => {
-      const isDark = document.body.classList.toggle("dark");
+    document
+      .getElementById("themeButton")
+      .addEventListener("click", () => {
+        const isDark =
+          document.body.classList.toggle("dark");
 
-      localStorage.setItem(
-        "agroFarmTheme",
-        isDark ? "dark" : "light"
-      );
+        localStorage.setItem(
+          "agroFarmTheme",
+          isDark ? "dark" : "light"
+        );
 
-      document.getElementById("themeLabel").textContent =
-        isDark ? "Light Mode" : "Dark Mode";
+        document.getElementById("themeLabel").textContent =
+          isDark ? "Light Mode" : "Dark Mode";
 
-      closeProfileMenu();
-    });
+        closeProfileMenu();
+      });
 
-    document.getElementById("fullscreenButton").addEventListener("click", async () => {
-      try {
-        if (!document.fullscreenElement) {
-          await document.documentElement.requestFullscreen();
-        } else {
-          await document.exitFullscreen();
+    document
+      .getElementById("fullscreenButton")
+      .addEventListener("click", async () => {
+        try {
+          if (!document.fullscreenElement) {
+            await document.documentElement.requestFullscreen();
+          } else {
+            await document.exitFullscreen();
+          }
+        } catch (error) {
+          showToast(
+            "Fullscreen is not supported in your browser.",
+            "error"
+          );
         }
-      } catch (error) {
-        showToast("Fullscreen is not supported in your browser.", "error");
-      }
-    });
+      });
 
     document.addEventListener("fullscreenchange", () => {
-      const icon = document.querySelector("#fullscreenButton i");
+      const icon =
+        document.querySelector("#fullscreenButton i");
 
       icon.className = document.fullscreenElement
         ? "fas fa-compress"
         : "fas fa-expand";
     });
 
-    document.getElementById("logoutButton").addEventListener("click", () => {
-      window.location.href = "/logout";
-    });
+    document
+      .getElementById("logoutButton")
+      .addEventListener("click", () => {
+        window.location.href = "/logout";
+      });
 
     function showToast(message, type = "success") {
       toast.textContent = message;
@@ -1350,18 +1406,32 @@
       }, 3000);
     }
 
-    function openModal(title, bodyHTML, confirmText, onConfirm) {
-      document.getElementById("modalTitle").textContent = title;
-      document.getElementById("modalBody").innerHTML = bodyHTML;
+    function openModal(
+      title,
+      bodyHTML,
+      confirmText,
+      onConfirm
+    ) {
+      document.getElementById("modalTitle").textContent =
+        title;
+
+      document.getElementById("modalBody").innerHTML =
+        bodyHTML;
 
       document.getElementById("modalFooter").innerHTML = `
-        <button class="outline-button" onclick="closeModal()">Cancel</button>
+        <button class="outline-button" onclick="closeModal()">
+          Cancel
+        </button>
+
         <button class="main-button" id="modalConfirmButton">
           ${confirmText}
         </button>
       `;
 
-      document.getElementById("modalConfirmButton").onclick = onConfirm;
+      document.getElementById(
+        "modalConfirmButton"
+      ).onclick = onConfirm;
+
       modalOverlay.classList.add("show");
     }
 
@@ -1375,25 +1445,39 @@
         `
           <div class="field">
             <label for="cropName">Crop name</label>
-            <input id="cropName" placeholder="Example: Maize">
+            <input
+              id="cropName"
+              placeholder="Example: Maize">
           </div>
 
           <div class="field">
             <label for="plantingDate">Planting date</label>
-            <input id="plantingDate" type="date">
+            <input
+              id="plantingDate"
+              type="date">
           </div>
         `,
         "Save Crop",
         () => {
-          const cropName = document.getElementById("cropName").value.trim();
+          const cropName =
+            document
+              .getElementById("cropName")
+              .value
+              .trim();
 
           if (!cropName) {
-            showToast("Enter the crop name.", "error");
+            showToast(
+              "Enter the crop name.",
+              "error"
+            );
             return;
           }
 
           closeModal();
-          showToast(`${cropName} crop plan saved.`);
+
+          showToast(
+            `${cropName} crop plan saved.`
+          );
         }
       );
     }
@@ -1404,25 +1488,44 @@
         `
           <div class="field">
             <label for="animalType">Animal type</label>
-            <input id="animalType" placeholder="Example: Cattle, goats, chickens">
+            <input
+              id="animalType"
+              placeholder="Example: Cattle, goats, chickens">
           </div>
 
           <div class="field">
-            <label for="animalCount">Number of animals</label>
-            <input id="animalCount" type="number" min="1" placeholder="Example: 10">
+            <label for="animalCount">
+              Number of animals
+            </label>
+
+            <input
+              id="animalCount"
+              type="number"
+              min="1"
+              placeholder="Example: 10">
           </div>
         `,
         "Save Livestock",
         () => {
-          const animalType = document.getElementById("animalType").value.trim();
+          const animalType =
+            document
+              .getElementById("animalType")
+              .value
+              .trim();
 
           if (!animalType) {
-            showToast("Enter the animal type.", "error");
+            showToast(
+              "Enter the animal type.",
+              "error"
+            );
             return;
           }
 
           closeModal();
-          showToast(`${animalType} livestock record saved.`);
+
+          showToast(
+            `${animalType} livestock record saved.`
+          );
         }
       );
     }
@@ -1433,25 +1536,39 @@
         `
           <div class="field">
             <label for="productName">Product name</label>
-            <input id="productName" placeholder="Example: Fresh tomatoes">
+            <input
+              id="productName"
+              placeholder="Example: Fresh tomatoes">
           </div>
 
           <div class="field">
             <label for="productPrice">Price</label>
-            <input id="productPrice" placeholder="Example: TZS 50,000">
+            <input
+              id="productPrice"
+              placeholder="Example: TZS 50,000">
           </div>
         `,
         "Create Listing",
         () => {
-          const productName = document.getElementById("productName").value.trim();
+          const productName =
+            document
+              .getElementById("productName")
+              .value
+              .trim();
 
           if (!productName) {
-            showToast("Enter the product name.", "error");
+            showToast(
+              "Enter the product name.",
+              "error"
+            );
             return;
           }
 
           closeModal();
-          showToast(`${productName} listing created.`);
+
+          showToast(
+            `${productName} listing created.`
+          );
         }
       );
     }
@@ -1462,26 +1579,48 @@
         `
           <div class="field">
             <label for="groupName">Group name</label>
-            <input id="groupName" placeholder="Example: Maize Farmers">
+            <input
+              id="groupName"
+              placeholder="Example: Maize Farmers">
           </div>
 
           <div class="field">
-            <label for="groupDescription">Description</label>
-            <textarea id="groupDescription"
+            <label for="groupDescription">
+              Description
+            </label>
+
+            <textarea
+              id="groupDescription"
               placeholder="What is this group about?"></textarea>
           </div>
         `,
         "Create Group",
         () => {
-          const name = document.getElementById("groupName").value.trim();
-          const description = document.getElementById("groupDescription").value.trim();
+          const name =
+            document
+              .getElementById("groupName")
+              .value
+              .trim();
+
+          const description =
+            document
+              .getElementById("groupDescription")
+              .value
+              .trim();
 
           if (!name) {
-            showToast("Enter a group name.", "error");
+            showToast(
+              "Enter a group name.",
+              "error"
+            );
             return;
           }
 
-          const code = "AGRO" + Math.floor(1000 + Math.random() * 9000);
+          const code =
+            "AGRO" +
+            Math.floor(
+              1000 + Math.random() * 9000
+            );
 
           farmerGroups.push({
             id: Date.now(),
@@ -1492,14 +1631,22 @@
           });
 
           saveGroups();
+
           closeModal();
-          showToast(`Group created. Code: ${code}`);
+
+          showToast(
+            `Group created. Code: ${code}`
+          );
         }
       );
     }
 
     function saveGroups() {
-      localStorage.setItem("agroFarmGroups", JSON.stringify(farmerGroups));
+      localStorage.setItem(
+        "agroFarmGroups",
+        JSON.stringify(farmerGroups)
+      );
+
       renderGroups();
     }
 
@@ -1513,9 +1660,12 @@
     }
 
     function renderGroups() {
-      const groupsList = document.getElementById("groupsList");
+      const groupsList =
+        document.getElementById("groupsList");
 
-      document.getElementById("groupCount").textContent = farmerGroups.length;
+      document.getElementById(
+        "groupCount"
+      ).textContent = farmerGroups.length;
 
       if (farmerGroups.length === 0) {
         groupsList.innerHTML = `
@@ -1523,37 +1673,63 @@
             You have not created a farmer group yet.
           </div>
         `;
+
         return;
       }
 
-      groupsList.innerHTML = farmerGroups.map(group => `
-        <div class="group-item">
-          <div class="group-info">
-            <h4>${escapeHtml(group.name)}</h4>
+      groupsList.innerHTML =
+        farmerGroups
+          .map(group => `
+            <div class="group-item">
 
-            <p>
-              ${escapeHtml(group.description || "No description")}
-              • ${group.members || 1} member(s)
-            </p>
+              <div class="group-info">
 
-            <span class="group-code">${escapeHtml(group.code)}</span>
-          </div>
+                <h4>
+                  ${escapeHtml(group.name)}
+                </h4>
 
-          <button class="outline-button"
-                  onclick="copyGroupCode('${escapeHtml(group.code)}')">
-            <i class="fas fa-copy"></i>
-            Copy
-          </button>
-        </div>
-      `).join("");
+                <p>
+                  ${escapeHtml(
+                    group.description ||
+                    "No description"
+                  )}
+                  •
+                  ${group.members || 1}
+                  member(s)
+                </p>
+
+                <span class="group-code">
+                  ${escapeHtml(group.code)}
+                </span>
+
+              </div>
+
+              <button
+                class="outline-button"
+                onclick="copyGroupCode('${escapeHtml(group.code)}')">
+
+                <i class="fas fa-copy"></i>
+                Copy
+
+              </button>
+
+            </div>
+          `)
+          .join("");
     }
 
     async function copyGroupCode(code) {
       try {
         await navigator.clipboard.writeText(code);
-        showToast(`Group code ${code} copied.`);
+
+        showToast(
+          `Group code ${code} copied.`
+        );
       } catch (error) {
-        showToast("Could not copy the group code.", "error");
+        showToast(
+          "Could not copy the group code.",
+          "error"
+        );
       }
     }
 
