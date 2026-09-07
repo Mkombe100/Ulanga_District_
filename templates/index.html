@@ -1,0 +1,1022 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Authentication - Create or Login</title>
+
+  <style>
+    :root {
+      --white: #ffffff;
+      --light-green: #c9f3d5;
+      --green-border: #8edaa3;
+      --green-text: #245b35;
+      --soft-green: #f3fff6;
+      --muted-green: #5a8065;
+      --error-red: #d9534f;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      background: var(--white);
+      color: var(--green-text);
+    }
+
+    .auth-wrapper {
+      width: 100%;
+      max-width: 470px;
+    }
+
+    .auth-card {
+      width: 100%;
+      padding: 42px 38px;
+      border: 1px solid var(--light-green);
+      border-radius: 18px;
+      background: var(--white);
+      box-shadow: 0 10px 35px rgba(142, 218, 163, 0.16);
+    }
+
+    .top-line {
+      width: 58px;
+      height: 5px;
+      margin-bottom: 24px;
+      border-radius: 20px;
+      background: var(--light-green);
+    }
+
+    h1 {
+      margin-bottom: 10px;
+      color: var(--green-text);
+      font-size: 29px;
+      line-height: 1.2;
+    }
+
+    .description {
+      margin-bottom: 30px;
+      color: var(--muted-green);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .form-group {
+      margin-bottom: 22px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 9px;
+      color: var(--green-text);
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 11px 4px;
+      border: none;
+      border-bottom: 2px solid var(--light-green);
+      outline: none;
+      background: transparent;
+      color: var(--green-text);
+      font-size: 15px;
+      transition: border-color 0.2s ease;
+    }
+
+    .form-input:focus {
+      border-bottom-color: var(--green-border);
+    }
+
+    .form-input::placeholder {
+      color: #9abda3;
+    }
+
+    .form-input.error {
+      border-bottom-color: var(--error-red);
+    }
+
+    .main-button {
+      width: 100%;
+      min-height: 50px;
+      margin-top: 6px;
+      border: 1px solid var(--green-border);
+      border-radius: 10px;
+      outline: none;
+      background: var(--light-green);
+      color: var(--green-text);
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .main-button:hover {
+      background: var(--soft-green);
+    }
+
+    .main-button:active {
+      transform: scale(0.99);
+    }
+
+    .main-button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .code-inputs {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 10px;
+      margin: 16px 0 26px;
+    }
+
+    .code-input {
+      width: 100%;
+      min-height: 50px;
+      aspect-ratio: 1 / 1;
+      border: 1px solid var(--light-green);
+      border-radius: 10px;
+      outline: none;
+      background: var(--white);
+      color: var(--green-text);
+      text-align: center;
+      font-size: 22px;
+      font-weight: 700;
+      transition: 0.2s ease;
+    }
+
+    .code-input:focus {
+      border: 2px solid var(--green-border);
+      background: var(--soft-green);
+    }
+
+    .code-input.error {
+      border-color: var(--error-red);
+      background: #fff5f5;
+    }
+
+    .resend-text {
+      margin-top: 18px;
+      color: var(--muted-green);
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .resend-text a {
+      color: var(--green-text);
+      border-bottom: 1px solid var(--green-border);
+      font-weight: 700;
+      text-decoration: none;
+      transition: 0.2s ease;
+    }
+
+    .resend-text a:hover {
+      color: var(--muted-green);
+      border-bottom-color: var(--light-green);
+    }
+
+    .status-message {
+      min-height: 20px;
+      margin-top: 18px;
+      color: var(--green-text);
+      text-align: center;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .status-message.error {
+      color: var(--error-red);
+    }
+
+    .error-message {
+      color: var(--error-red);
+      font-size: 13px;
+      margin-top: 6px;
+      min-height: 18px;
+    }
+
+    .switch-auth {
+      margin-top: 24px;
+      text-align: center;
+      color: var(--muted-green);
+      font-size: 14px;
+    }
+
+    .switch-auth a {
+      color: var(--green-text);
+      font-weight: 700;
+      text-decoration: none;
+      border-bottom: 1px solid var(--green-border);
+      transition: 0.2s ease;
+    }
+
+    .switch-auth a:hover {
+      color: var(--muted-green);
+      border-bottom-color: var(--light-green);
+    }
+
+    /* Top notification popup */
+    .toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      z-index: 1000;
+      width: min(92%, 480px);
+      overflow: hidden;
+      padding: 20px 18px 16px;
+      border: 1px solid var(--green-border);
+      border-radius: 12px;
+      background: var(--white);
+      box-shadow: 0 10px 30px rgba(36, 91, 53, 0.15);
+      color: var(--green-text);
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, -150%);
+      transition: transform 0.35s ease, opacity 0.35s ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    .toast.error {
+      border-color: var(--error-red);
+      box-shadow: 0 10px 30px rgba(217, 83, 79, 0.15);
+    }
+
+    .toast.error .toast-title {
+      color: var(--error-red);
+    }
+
+    /* Progress line reduces from 100% to 0% in 2 seconds */
+    .toast-progress {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: var(--green-border);
+      transform-origin: left center;
+    }
+
+    .toast-progress.run {
+      animation: decreaseProgress 2s linear forwards;
+    }
+
+    .toast-title {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--green-text);
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .toast-message {
+      color: var(--muted-green);
+      font-size: 13px;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @keyframes decreaseProgress {
+      from {
+        transform: scaleX(1);
+      }
+
+      to {
+        transform: scaleX(0);
+      }
+    }
+
+    /* Tablets and phones */
+    @media (max-width: 600px) {
+      body {
+        align-items: flex-start;
+        padding: 20px 14px;
+      }
+
+      .auth-card {
+        padding: 32px 22px;
+        border-radius: 14px;
+      }
+
+      h1 {
+        font-size: 25px;
+      }
+
+      .description {
+        margin-bottom: 26px;
+        font-size: 14px;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+      }
+
+      .code-inputs {
+        gap: 8px;
+      }
+
+      .code-input {
+        min-height: 43px;
+        border-radius: 8px;
+        font-size: 19px;
+      }
+
+      .toast {
+        top: 14px;
+        padding: 19px 16px 14px;
+      }
+    }
+
+    /* Very small phones */
+    @media (max-width: 360px) {
+      .auth-card {
+        padding: 28px 18px;
+      }
+
+      .code-inputs {
+        gap: 5px;
+      }
+
+      .code-input {
+        min-height: 38px;
+        font-size: 17px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Top toast notification -->
+  <div class="toast" id="authToast" role="status" aria-live="polite">
+    <div class="toast-progress" id="toastProgress"></div>
+
+    <span class="toast-title" id="toastTitle">
+      Verification code sent
+    </span>
+
+    <p class="toast-message" id="toastMessage">
+      A 6-digit verification code was sent to your email.
+    </p>
+  </div>
+
+  <main class="auth-wrapper">
+    <div class="auth-card">
+
+      <!-- Login page -->
+      <section id="loginScreen">
+        <div class="top-line"></div>
+
+        <h1>Welcome back</h1>
+
+        <p class="description">
+          Enter your email to log in to your account.
+        </p>
+
+        <form id="loginForm">
+          <div class="form-group">
+            <label for="loginEmail">Email address</label>
+
+            <input
+              class="form-input"
+              type="email"
+              id="loginEmail"
+              name="email"
+              placeholder="name@example.com"
+              autocomplete="email"
+              required
+            />
+
+            <div class="error-message" id="loginEmailError"></div>
+          </div>
+
+          <button type="submit" class="main-button" id="loginButton">
+            Continue with email
+          </button>
+        </form>
+
+        <p class="switch-auth">
+          Don't have an account?
+          <a href="#" id="switchToSignup">Create one</a>
+        </p>
+      </section>
+
+      <!-- Signup page -->
+      <section id="signupScreen" class="hidden">
+        <div class="top-line"></div>
+
+        <h1>Create your account</h1>
+
+        <p class="description">
+          Enter your personal details to create a new account.
+        </p>
+
+        <form id="signupForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="firstName">First name</label>
+
+              <input
+                class="form-input"
+                type="text"
+                id="firstName"
+                name="firstName"
+                placeholder="First name"
+                autocomplete="given-name"
+                required
+              />
+
+              <div class="error-message" id="firstNameError"></div>
+            </div>
+
+            <div class="form-group">
+              <label for="lastName">Last name</label>
+
+              <input
+                class="form-input"
+                type="text"
+                id="lastName"
+                name="lastName"
+                placeholder="Last name"
+                autocomplete="family-name"
+                required
+              />
+
+              <div class="error-message" id="lastNameError"></div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="phone">Phone number</label>
+
+            <input
+              class="form-input"
+              type="tel"
+              id="phone"
+              name="phone"
+              placeholder="0670 595 758"
+              autocomplete="tel"
+              required
+            />
+
+            <div class="error-message" id="phoneError"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email address</label>
+
+            <input
+              class="form-input"
+              type="email"
+              id="email"
+              name="email"
+              placeholder="name@example.com"
+              autocomplete="email"
+              required
+            />
+
+            <div class="error-message" id="emailError"></div>
+          </div>
+
+          <button type="submit" class="main-button" id="signupButton">
+            Create account
+          </button>
+        </form>
+
+        <p class="switch-auth">
+          Already have an account?
+          <a href="#" id="switchToLogin">Log in</a>
+        </p>
+      </section>
+
+      <!-- Verification page -->
+      <section id="verificationScreen" class="hidden">
+        <div class="top-line"></div>
+
+        <h1>Verify your account</h1>
+
+        <p class="description">
+          Enter the 6-digit verification code sent to <strong id="verificationEmail"></strong>.
+        </p>
+
+        <form id="verificationForm">
+          <div class="code-inputs">
+            <input
+              class="code-input"
+              type="text"
+              inputmode="numeric"
+              maxlength="1"
+              aria-label="Verification digit 1"
+              required
+            />
+
+            <input
+              class="code-input"
+              type="text"
+              inputmode="numeric"
+              maxlength="1"
+              aria-label="Verification digit 2"
+              required
+            />
+
+            <input
+              class="code-input"
+              type="text"
+              inputmode="numeric"
+              maxlength="1"
+              aria-label="Verification digit 3"
+              required
+            />
+
+            <input
+              class="code-input"
+              type="text"
+              inputmode="numeric"
+              maxlength="1"
+              aria-label="Verification digit 4"
+              required
+            />
+
+            <input
+              class="code-input"
+              type="text"
+              inputmode="numeric"
+              maxlength="1"
+              aria-label="Verification digit 5"
+              required
+            />
+
+            <input
+              class="code-input"
+              type="text"
+              inputmode="numeric"
+              maxlength="1"
+              aria-label="Verification digit 6"
+              required
+            />
+          </div>
+
+          <button type="submit" class="main-button" id="verifyButton">
+            Verify code
+          </button>
+
+          <p class="resend-text">
+            Didn't get the code?
+            <a href="#" id="resendCode">Resend</a>
+          </p>
+
+          <div class="status-message" id="statusMessage"></div>
+        </form>
+      </section>
+
+    </div>
+  </main>
+
+  <script>
+    // DOM Elements
+    const loginScreen = document.getElementById("loginScreen");
+    const signupScreen = document.getElementById("signupScreen");
+    const verificationScreen = document.getElementById("verificationScreen");
+
+    const loginForm = document.getElementById("loginForm");
+    const signupForm = document.getElementById("signupForm");
+    const verificationForm = document.getElementById("verificationForm");
+
+    const loginEmail = document.getElementById("loginEmail");
+    const firstName = document.getElementById("firstName");
+    const lastName = document.getElementById("lastName");
+    const phone = document.getElementById("phone");
+    const email = document.getElementById("email");
+
+    const verificationEmail = document.getElementById("verificationEmail");
+    const codeInputs = document.querySelectorAll(".code-input");
+    const statusMessage = document.getElementById("statusMessage");
+
+    const switchToSignup = document.getElementById("switchToSignup");
+    const switchToLogin = document.getElementById("switchToLogin");
+    const resendCode = document.getElementById("resendCode");
+
+    const authToast = document.getElementById("authToast");
+    const toastProgress = document.getElementById("toastProgress");
+    const toastTitle = document.getElementById("toastTitle");
+    const toastMessage = document.getElementById("toastMessage");
+
+    const loginButton = document.getElementById("loginButton");
+    const signupButton = document.getElementById("signupButton");
+    const verifyButton = document.getElementById("verifyButton");
+
+    // State
+    let currentAuthMode = "login"; // "login" or "signup"
+    let currentEmail = "";
+    let toastTimer;
+
+    // ---------- UTILITY FUNCTIONS ----------
+
+    function clearErrors() {
+      document.querySelectorAll(".form-input").forEach(input => {
+        input.classList.remove("error");
+      });
+      document.querySelectorAll(".error-message").forEach(el => {
+        el.textContent = "";
+      });
+      statusMessage.textContent = "";
+      statusMessage.classList.remove("error");
+    }
+
+    function showError(fieldId, message) {
+      const field = document.getElementById(fieldId);
+      const errorEl = document.getElementById(fieldId + "Error");
+
+      if (field) field.classList.add("error");
+      if (errorEl) errorEl.textContent = message;
+    }
+
+    function showToast(title, message, isError = false) {
+      clearTimeout(toastTimer);
+
+      toastTitle.textContent = title;
+      toastMessage.textContent = message;
+
+      authToast.classList.remove("error");
+      if (isError) {
+        authToast.classList.add("error");
+      }
+
+      // Restart countdown line at 100%
+      toastProgress.classList.remove("run");
+      void toastProgress.offsetWidth;
+      toastProgress.classList.add("run");
+
+      authToast.classList.add("show");
+
+      toastTimer = setTimeout(function () {
+        authToast.classList.remove("show");
+      }, 2000);
+    }
+
+    function setButtonLoading(button, isLoading) {
+      if (isLoading) {
+        button.disabled = true;
+        button.textContent = "Please wait...";
+      } else {
+        button.disabled = false;
+        if (button === loginButton) button.textContent = "Continue with email";
+        if (button === signupButton) button.textContent = "Create account";
+        if (button === verifyButton) button.textContent = "Verify code";
+      }
+    }
+
+    function switchScreen(screen) {
+      loginScreen.classList.add("hidden");
+      signupScreen.classList.add("hidden");
+      verificationScreen.classList.add("hidden");
+      screen.classList.remove("hidden");
+      clearErrors();
+    }
+
+    // ---------- NAVIGATION ----------
+
+    switchToSignup.addEventListener("click", function (event) {
+      event.preventDefault();
+      currentAuthMode = "signup";
+      switchScreen(signupScreen);
+    });
+
+    switchToLogin.addEventListener("click", function (event) {
+      event.preventDefault();
+      currentAuthMode = "login";
+      switchScreen(loginScreen);
+    });
+
+    // ---------- LOGIN FLOW ----------
+
+    loginForm.addEventListener("submit", async function (event) {
+      event.preventDefault();
+      clearErrors();
+
+      const emailValue = loginEmail.value.trim();
+
+      if (!emailValue || !/^\S+@\S+\.\S+$/.test(emailValue)) {
+        showError("loginEmail", "Please enter a valid email address");
+        return;
+      }
+
+      setButtonLoading(loginButton, true);
+
+      try {
+        const response = await fetch("/api/login/request-code", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: emailValue }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Failed to send verification code");
+        }
+
+        currentEmail = emailValue.toLowerCase().trim();
+        verificationEmail.textContent = currentEmail;
+
+        showToast("Verification code sent", "A 6-digit code was sent to " + currentEmail);
+
+        setTimeout(function () {
+          switchScreen(verificationScreen);
+          codeInputs[0].focus();
+        }, 2000);
+
+      } catch (error) {
+        showToast(error.message, "", true);
+        showError("loginEmail", error.message);
+      } finally {
+        setButtonLoading(loginButton, false);
+      }
+    });
+
+    // ---------- SIGNUP FLOW ----------
+
+    signupForm.addEventListener("submit", async function (event) {
+      event.preventDefault();
+      clearErrors();
+
+      const firstNameValue = firstName.value.trim();
+      const lastNameValue = lastName.value.trim();
+      const phoneValue = phone.value.trim();
+      const emailValue = email.value.trim();
+
+      let hasError = false;
+
+      if (!firstNameValue) {
+        showError("firstName", "First name is required");
+        hasError = true;
+      }
+
+      if (!lastNameValue) {
+        showError("lastName", "Last name is required");
+        hasError = true;
+      }
+
+      if (!phoneValue) {
+        showError("phone", "Phone number is required");
+        hasError = true;
+      }
+
+      if (!emailValue || !/^\S+@\S+\.\S+$/.test(emailValue)) {
+        showError("email", "Please enter a valid email address");
+        hasError = true;
+      }
+
+      if (hasError) return;
+
+      setButtonLoading(signupButton, true);
+
+      try {
+        const response = await fetch("/api/signup/request-code", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            firstName: firstNameValue,
+            lastName: lastNameValue,
+            email: emailValue,
+            phone: phoneValue,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Failed to send verification code");
+        }
+
+        currentEmail = emailValue.toLowerCase().trim();
+        verificationEmail.textContent = currentEmail;
+
+        showToast("Verification code sent", "A 6-digit code was sent to " + currentEmail);
+
+        setTimeout(function () {
+          switchScreen(verificationScreen);
+          codeInputs[0].focus();
+        }, 2000);
+
+      } catch (error) {
+        showToast(error.message, "", true);
+
+        if (error.message.includes("email")) {
+          showError("email", error.message);
+        } else if (error.message.includes("phone")) {
+          showError("phone", error.message);
+        } else {
+          showError("email", error.message);
+        }
+      } finally {
+        setButtonLoading(signupButton, false);
+      }
+    });
+
+    // ---------- VERIFICATION FLOW ----------
+
+    resendCode.addEventListener("click", async function (event) {
+      event.preventDefault();
+      statusMessage.textContent = "";
+      statusMessage.classList.remove("error");
+
+      codeInputs.forEach(function (input) {
+        input.value = "";
+      });
+
+      codeInputs[0].focus();
+
+      try {
+        let response;
+
+        if (currentAuthMode === "signup") {
+          response = await fetch("/api/signup/request-code", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              firstName: firstName.value.trim(),
+              lastName: lastName.value.trim(),
+              email: currentEmail,
+              phone: phone.value.trim(),
+            }),
+          });
+        } else {
+          response = await fetch("/api/login/request-code", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: currentEmail }),
+          });
+        }
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Failed to resend code");
+        }
+
+        showToast("Code resent", "A new code was sent to " + currentEmail);
+
+      } catch (error) {
+        showToast(error.message, "", true);
+        statusMessage.textContent = error.message;
+        statusMessage.classList.add("error");
+      }
+    });
+
+    // Code input behavior
+    codeInputs.forEach(function (input, index) {
+      input.addEventListener("input", function () {
+        this.value = this.value.replace(/[^0-9]/g, "");
+
+        if (this.value && index < codeInputs.length - 1) {
+          codeInputs[index + 1].focus();
+        }
+      });
+
+      input.addEventListener("keydown", function (event) {
+        if (event.key === "Backspace" && !this.value && index > 0) {
+          codeInputs[index - 1].focus();
+        }
+      });
+
+      input.addEventListener("paste", function (event) {
+        event.preventDefault();
+
+        const pastedCode = event.clipboardData
+          .getData("text")
+          .replace(/[^0-9]/g, "")
+          .slice(0, 6);
+
+        pastedCode.split("").forEach(function (digit, position) {
+          if (codeInputs[position]) {
+            codeInputs[position].value = digit;
+          }
+        });
+
+        const emptyInput = [...codeInputs].find(function (input) {
+          return input.value === "";
+        });
+
+        if (emptyInput) {
+          emptyInput.focus();
+        } else {
+          codeInputs[5].focus();
+        }
+      });
+    });
+
+    verificationForm.addEventListener("submit", async function (event) {
+      event.preventDefault();
+      statusMessage.textContent = "";
+      statusMessage.classList.remove("error");
+
+      const verificationCode = [...codeInputs]
+        .map(function (input) {
+          return input.value;
+        })
+        .join("");
+
+      if (verificationCode.length !== 6) {
+        statusMessage.textContent = "Please enter the complete 6-digit code.";
+        statusMessage.classList.add("error");
+        return;
+      }
+
+      setButtonLoading(verifyButton, true);
+
+      try {
+        let response;
+        let endpoint;
+
+        if (currentAuthMode === "signup") {
+          endpoint = "/api/signup/verify-and-create";
+          response = await fetch(endpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: currentEmail,
+              code: verificationCode,
+            }),
+          });
+        } else {
+          endpoint = "/api/login/verify";
+          response = await fetch(endpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: currentEmail,
+              code: verificationCode,
+            }),
+          });
+        }
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Verification failed");
+        }
+
+        statusMessage.textContent = data.ok 
+          ? "Success! Redirecting..." 
+          : "Verification successful!";
+
+        // Store user data in localStorage (for demo - use proper auth in production)
+        if (data.user) {
+          localStorage.setItem("user", JSON.stringify(data.user));
+        }
+
+        setTimeout(function () {
+          if (data.redirect) {
+            window.location.href = data.redirect;
+          } else {
+            window.location.href = "/dashboard.html";
+          }
+        }, 1000);
+
+      } catch (error) {
+        statusMessage.textContent = error.message;
+        statusMessage.classList.add("error");
+
+        // Highlight code inputs as error
+        codeInputs.forEach(input => input.classList.add("error"));
+      } finally {
+        setButtonLoading(verifyButton, false);
+      }
+    });
+
+    // Clear error styling on input
+    codeInputs.forEach(input => {
+      input.addEventListener("input", function() {
+        this.classList.remove("error");
+      });
+    });
+  </script>
+
+</body>
+</html>

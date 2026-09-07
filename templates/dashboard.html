@@ -1,0 +1,1564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgroFarm Dashboard</title>
+
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root {
+      --white: #ffffff;
+      --light-green: #c9f3d5;
+      --green-border: #8edaa3;
+      --green-text: #245b35;
+      --soft-green: #f3fff6;
+      --muted-green: #5a8065;
+      --dark-green: #073e49;
+      --dark-green-2: #052f38;
+      --sidebar-text: #d6ece0;
+      --sidebar-muted: #9abda3;
+      --error-red: #d9534f;
+
+      --body-bg: #f7fcf8;
+      --surface: #ffffff;
+      --border: #d8f1df;
+      --text: #245b35;
+      --muted: #5a8065;
+    }
+
+    body.dark {
+      --body-bg: #0d1d16;
+      --surface: #14271d;
+      --soft-green: #1d3627;
+      --border: #315d40;
+      --text: #eefcf2;
+      --muted: #b2d0bc;
+      --dark-green: #041e25;
+      --dark-green-2: #03161b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--body-bg);
+      color: var(--text);
+      transition: 0.25s ease;
+    }
+
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    /* Layout */
+
+    .layout {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      grid-template-rows: 58px 1fr;
+    }
+
+    /* Sidebar */
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      z-index: 100;
+      width: 220px;
+      background: var(--dark-green);
+      color: white;
+      transition: transform 0.25s ease;
+    }
+
+    .brand {
+      height: 58px;
+      padding: 0 16px;
+      background: var(--dark-green-2);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .brand i {
+      color: var(--light-green);
+      font-size: 19px;
+    }
+
+    .brand small {
+      color: #9abda3;
+      font-size: 10px;
+      font-weight: 400;
+    }
+
+    .menu-title {
+      margin: 23px 0 8px;
+      padding: 0 15px;
+      color: var(--sidebar-muted);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .nav-list {
+      list-style: none;
+    }
+
+    .nav-button {
+      width: 100%;
+      padding: 12px 15px;
+      border: none;
+      border-left: 3px solid transparent;
+      background: transparent;
+      color: var(--sidebar-text);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-align: left;
+      font-size: 13px;
+      transition: 0.2s ease;
+    }
+
+    .nav-button i {
+      width: 16px;
+      color: #9abda3;
+      text-align: center;
+    }
+
+    .nav-button:hover,
+    .nav-button.active {
+      border-left-color: var(--light-green);
+      background: rgba(201, 243, 213, 0.14);
+      color: white;
+    }
+
+    .nav-button:hover i,
+    .nav-button.active i {
+      color: var(--light-green);
+    }
+
+    /* Topbar */
+
+    .topbar {
+      position: fixed;
+      top: 0;
+      right: 0;
+      left: 220px;
+      z-index: 90;
+      height: 58px;
+      padding: 0 15px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .topbar-left,
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .welcome-text {
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .welcome-text strong {
+      color: var(--green-text);
+    }
+
+    .icon-button {
+      width: 35px;
+      height: 35px;
+      border: 1px solid transparent;
+      border-radius: 7px;
+      background: var(--soft-green);
+      color: var(--green-text);
+      transition: 0.2s ease;
+    }
+
+    .icon-button:hover {
+      border-color: var(--green-border);
+      background: var(--light-green);
+    }
+
+    .mobile-menu-button {
+      display: none;
+    }
+
+    .profile-section {
+      position: relative;
+    }
+
+    .profile-button {
+      min-height: 35px;
+      padding: 4px 8px 4px 5px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      background: var(--soft-green);
+      color: var(--green-text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .profile-avatar {
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      background: var(--green-text);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .profile-dropdown {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      width: 260px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+      box-shadow: 0 12px 30px rgba(36, 91, 53, 0.16);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-8px);
+      transition: 0.2s ease;
+    }
+
+    .profile-dropdown.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .profile-header {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 11px;
+    }
+
+    .large-avatar {
+      width: 43px;
+      height: 43px;
+      border-radius: 50%;
+      background: var(--green-text);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .profile-name {
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .profile-email {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 11px;
+      overflow-wrap: anywhere;
+    }
+
+    .profile-actions {
+      padding: 8px;
+    }
+
+    .profile-action {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 7px;
+      background: transparent;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-align: left;
+      font-size: 13px;
+    }
+
+    .profile-action:hover {
+      background: var(--soft-green);
+      color: var(--green-text);
+    }
+
+    .profile-action.danger:hover {
+      background: #fff2f2;
+      color: var(--error-red);
+    }
+
+    /* Main content */
+
+    .main-content {
+      grid-column: 2;
+      grid-row: 2;
+      min-width: 0;
+      padding-bottom: 68px;
+    }
+
+    .banner {
+      min-height: 110px;
+      padding: 28px 42px;
+      background:
+        linear-gradient(90deg, rgba(7, 62, 73, 0.95), rgba(36, 91, 53, 0.75)),
+        linear-gradient(135deg, #0d4f3e, #9bd7aa);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .banner h1 {
+      font-size: 28px;
+      font-weight: 500;
+    }
+
+    .banner p {
+      margin-top: 7px;
+      color: #e0f5e5;
+      font-size: 13px;
+    }
+
+    .content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 28px 42px;
+    }
+
+    .section {
+      display: none;
+      animation: fadeIn 0.25s ease;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(5px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .heading {
+      margin-bottom: 20px;
+    }
+
+    .heading h2 {
+      color: var(--text);
+      font-size: 21px;
+    }
+
+    .heading p {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* Summary cards */
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(140px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .summary-card {
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+      box-shadow: 0 4px 15px rgba(36, 91, 53, 0.05);
+    }
+
+    .summary-icon {
+      width: 41px;
+      height: 41px;
+      border-radius: 11px;
+      background: var(--light-green);
+      color: var(--green-text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .summary-number {
+      margin-top: 15px;
+      color: var(--green-text);
+      font-size: 25px;
+      font-weight: 700;
+    }
+
+    .summary-label {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    /* Function cards */
+
+    .function-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(160px, 1fr));
+      gap: 17px;
+    }
+
+    .function-card {
+      min-height: 180px;
+      padding: 22px 12px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      box-shadow: 0 4px 16px rgba(36, 91, 53, 0.04);
+      transition: 0.22s ease;
+      cursor: pointer;
+    }
+
+    .function-card:hover {
+      border-color: var(--green-border);
+      box-shadow: 0 12px 25px rgba(36, 91, 53, 0.12);
+      transform: translateY(-4px);
+    }
+
+    .function-card i {
+      margin-bottom: 18px;
+      color: var(--green-text);
+      font-size: 40px;
+    }
+
+    .function-card h3 {
+      color: var(--green-text);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .function-card p {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.45;
+    }
+
+    /* Feature pages */
+
+    .feature-card {
+      max-width: 650px;
+      padding: 25px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+      box-shadow: 0 4px 16px rgba(36, 91, 53, 0.05);
+    }
+
+    .feature-card h2 {
+      margin-bottom: 10px;
+      color: var(--green-text);
+      font-size: 19px;
+    }
+
+    .feature-card h2 i {
+      margin-right: 7px;
+      color: #43be84;
+    }
+
+    .feature-card p {
+      margin-bottom: 20px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .main-button {
+      padding: 11px 17px;
+      border: 1px solid var(--green-border);
+      border-radius: 8px;
+      background: var(--light-green);
+      color: var(--green-text);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      transition: 0.2s ease;
+    }
+
+    .main-button:hover {
+      background: var(--soft-green);
+      transform: translateY(-2px);
+    }
+
+    .outline-button {
+      padding: 9px 14px;
+      border: 1px solid var(--green-border);
+      border-radius: 8px;
+      background: transparent;
+      color: var(--green-text);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .outline-button:hover {
+      background: var(--soft-green);
+    }
+
+    /* Groups */
+
+    .groups-list {
+      max-width: 850px;
+      margin-top: 20px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+    }
+
+    .groups-header {
+      padding: 15px 18px;
+      border-bottom: 1px solid var(--border);
+      background: var(--soft-green);
+      color: var(--green-text);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .group-item {
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .group-item:last-child {
+      border-bottom: none;
+    }
+
+    .group-info h4 {
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    .group-info p {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .group-code {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 5px 9px;
+      border-radius: 14px;
+      background: var(--soft-green);
+      color: var(--green-text);
+      font-family: monospace;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .empty-groups {
+      padding: 30px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 13px;
+    }
+
+    /* Modal */
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 500;
+      background: rgba(4, 47, 35, 0.65);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: 0.2s ease;
+    }
+
+    .modal-overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal {
+      width: min(92%, 450px);
+      padding: 24px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--surface);
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.25);
+      transform: scale(0.96);
+      transition: 0.2s ease;
+    }
+
+    .modal-overlay.show .modal {
+      transform: scale(1);
+    }
+
+    .modal-header {
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-header h3 {
+      color: var(--green-text);
+      font-size: 19px;
+    }
+
+    .close-modal {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-size: 25px;
+    }
+
+    .modal-body {
+      margin-bottom: 20px;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .field {
+      margin-bottom: 16px;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--green-text);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .field input,
+    .field textarea {
+      width: 100%;
+      padding: 11px;
+      border: 1px solid var(--green-border);
+      border-radius: 8px;
+      outline: none;
+      background: var(--surface);
+      color: var(--text);
+      font-size: 13px;
+    }
+
+    .field textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    .field input:focus,
+    .field textarea:focus {
+      border-color: var(--green-text);
+      box-shadow: 0 0 0 3px rgba(142, 218, 163, 0.25);
+    }
+
+    /* Toast and footer */
+
+    .toast {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      z-index: 600;
+      max-width: min(90%, 390px);
+      padding: 13px 17px;
+      border-left: 4px solid var(--green-text);
+      border-radius: 8px;
+      background: var(--surface);
+      box-shadow: 0 10px 35px rgba(36, 91, 53, 0.16);
+      color: var(--text);
+      font-size: 13px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(12px);
+      transition: 0.25s ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .toast.error {
+      border-left-color: var(--error-red);
+    }
+
+    .footer {
+      position: fixed;
+      right: 0;
+      bottom: 0;
+      left: 220px;
+      min-height: 52px;
+      padding: 0 28px;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+    }
+
+    .footer strong {
+      color: var(--green-text);
+    }
+
+    /* Mobile */
+
+    @media (max-width: 1150px) {
+      .function-grid {
+        grid-template-columns: repeat(3, minmax(160px, 1fr));
+      }
+    }
+
+    @media (max-width: 780px) {
+      .layout {
+        display: block;
+      }
+
+      .sidebar {
+        transform: translateX(-100%);
+        box-shadow: 10px 0 25px rgba(0, 0, 0, 0.2);
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .topbar {
+        left: 0;
+      }
+
+      .main-content {
+        padding-top: 58px;
+      }
+
+      .footer {
+        left: 0;
+      }
+
+      .mobile-menu-button {
+        display: block;
+      }
+
+      .welcome-text {
+        display: none;
+      }
+
+      .banner {
+        padding: 24px 20px;
+      }
+
+      .content {
+        padding: 23px 20px 80px;
+      }
+
+      .function-grid {
+        grid-template-columns: repeat(2, minmax(135px, 1fr));
+      }
+
+      .summary-grid {
+        grid-template-columns: repeat(2, minmax(135px, 1fr));
+      }
+    }
+
+    @media (max-width: 420px) {
+      .function-card {
+        min-height: 155px;
+        padding: 15px 8px;
+      }
+
+      .function-card i {
+        margin-bottom: 13px;
+        font-size: 34px;
+      }
+
+      .function-card h3 {
+        font-size: 10px;
+      }
+
+      .footer {
+        padding: 0 15px;
+        font-size: 10px;
+      }
+
+      .footer span:last-child {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <i class="fas fa-seedling"></i>
+        <span>AGROFARM</span>
+        <small>2.0</small>
+      </div>
+
+      <div class="menu-title">Main Menu</div>
+
+      <ul class="nav-list">
+        <li>
+          <button class="nav-button active" data-section="dashboardSection">
+            <i class="fas fa-gauge-high"></i>
+            <span>Dashboard</span>
+          </button>
+        </li>
+      </ul>
+
+      <div class="menu-title">Farm Services</div>
+
+      <ul class="nav-list">
+        <li>
+          <button class="nav-button" data-section="cropsSection">
+            <i class="fas fa-wheat-awn"></i>
+            <span>Crop Management</span>
+          </button>
+        </li>
+
+        <li>
+          <button class="nav-button" data-section="livestockSection">
+            <i class="fas fa-cow"></i>
+            <span>Livestock</span>
+          </button>
+        </li>
+
+        <li>
+          <button class="nav-button" data-section="weatherSection">
+            <i class="fas fa-cloud-sun-rain"></i>
+            <span>Weather & Alerts</span>
+          </button>
+        </li>
+
+        <li>
+          <button class="nav-button" data-section="marketSection">
+            <i class="fas fa-store"></i>
+            <span>Marketplace</span>
+          </button>
+        </li>
+
+        <li>
+          <button class="nav-button" data-section="groupsSection">
+            <i class="fas fa-users"></i>
+            <span>Farmer Groups</span>
+          </button>
+        </li>
+      </ul>
+    </aside>
+
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="icon-button mobile-menu-button" id="mobileMenuButton">
+          <i class="fas fa-bars"></i>
+        </button>
+
+        <button class="icon-button" id="desktopMenuButton" title="Menu">
+          <i class="fas fa-ellipsis-vertical"></i>
+        </button>
+
+        <p class="welcome-text">
+          Welcome,
+          <strong>{{ user.first_name or "Farmer" }} {{ user.last_name or "" }}</strong>
+        </p>
+      </div>
+
+      <div class="topbar-right">
+        <button class="icon-button" id="fullscreenButton" title="Fullscreen">
+          <i class="fas fa-expand"></i>
+        </button>
+
+        <div class="profile-section">
+          <button class="profile-button" id="profileButton">
+            <span class="profile-avatar" id="smallInitials">F</span>
+            <i class="fas fa-chevron-down"></i>
+          </button>
+
+          <div class="profile-dropdown" id="profileDropdown">
+            <div class="profile-header">
+              <div class="large-avatar" id="largeInitials">F</div>
+
+              <div>
+                <div class="profile-name">
+                  {{ user.first_name or "Farmer" }} {{ user.last_name or "" }}
+                </div>
+
+                <div class="profile-email">{{ user.email }}</div>
+              </div>
+            </div>
+
+            <div class="profile-actions">
+              <button class="profile-action" id="themeButton">
+                <i class="fas fa-moon"></i>
+                <span id="themeLabel">Dark Mode</span>
+              </button>
+
+              <button class="profile-action danger" id="logoutButton">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Sign Out</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main content -->
+    <main class="main-content">
+      <div class="banner">
+        <h1 id="pageTitle">Agriculture Dashboard</h1>
+        <p id="pageDescription">
+          Manage your essential farm services from one dashboard.
+        </p>
+      </div>
+
+      <div class="content">
+
+        <!-- Dashboard -->
+        <section class="section active" id="dashboardSection">
+          <div class="heading">
+            <h2>Farm Overview</h2>
+            <p>Simple overview of your farm information.</p>
+          </div>
+
+          <div class="summary-grid">
+            <article class="summary-card">
+              <div class="summary-icon">
+                <i class="fas fa-wheat-awn"></i>
+              </div>
+              <div class="summary-number">0</div>
+              <div class="summary-label">Crop Plans</div>
+            </article>
+
+            <article class="summary-card">
+              <div class="summary-icon">
+                <i class="fas fa-cow"></i>
+              </div>
+              <div class="summary-number">0</div>
+              <div class="summary-label">Livestock Records</div>
+            </article>
+
+            <article class="summary-card">
+              <div class="summary-icon">
+                <i class="fas fa-cloud-sun"></i>
+              </div>
+              <div class="summary-number">--°C</div>
+              <div class="summary-label">Weather</div>
+            </article>
+
+            <article class="summary-card">
+              <div class="summary-icon">
+                <i class="fas fa-users"></i>
+              </div>
+              <div class="summary-number" id="groupCount">0</div>
+              <div class="summary-label">Farmer Groups</div>
+            </article>
+          </div>
+
+          <div class="heading">
+            <h2>Farm Functionalities</h2>
+            <p>Select one of the five main agriculture services.</p>
+          </div>
+
+          <div class="function-grid">
+            <article class="function-card" data-section-target="cropsSection">
+              <i class="fas fa-wheat-awn"></i>
+              <h3>Crop Management</h3>
+              <p>Plan and monitor crop production.</p>
+            </article>
+
+            <article class="function-card" data-section-target="livestockSection">
+              <i class="fas fa-cow"></i>
+              <h3>Livestock</h3>
+              <p>Manage animals and health records.</p>
+            </article>
+
+            <article class="function-card" data-section-target="weatherSection">
+              <i class="fas fa-cloud-sun-rain"></i>
+              <h3>Weather & Alerts</h3>
+              <p>Get weather and farming alerts.</p>
+            </article>
+
+            <article class="function-card" data-section-target="marketSection">
+              <i class="fas fa-store"></i>
+              <h3>Marketplace</h3>
+              <p>Sell farm products and find inputs.</p>
+            </article>
+
+            <article class="function-card" data-section-target="groupsSection">
+              <i class="fas fa-users"></i>
+              <h3>Farmer Groups</h3>
+              <p>Join farming communities.</p>
+            </article>
+          </div>
+        </section>
+
+        <!-- Crop Management -->
+        <section class="section" id="cropsSection">
+          <div class="heading">
+            <h2>Crop Management</h2>
+            <p>Save crop plans and keep track of your crop activities.</p>
+          </div>
+
+          <article class="feature-card">
+            <h2><i class="fas fa-seedling"></i> Add Crop Plan</h2>
+            <p>Add a crop such as maize, rice, beans, tomatoes, vegetables, or fruits.</p>
+
+            <button class="main-button" onclick="openCropModal()">
+              <i class="fas fa-plus"></i>
+              Add Crop
+            </button>
+          </article>
+        </section>
+
+        <!-- Livestock -->
+        <section class="section" id="livestockSection">
+          <div class="heading">
+            <h2>Livestock</h2>
+            <p>Record farm animals and basic animal health information.</p>
+          </div>
+
+          <article class="feature-card">
+            <h2><i class="fas fa-cow"></i> Add Livestock Record</h2>
+            <p>Register cattle, goats, sheep, chickens, pigs, fish, or other animals.</p>
+
+            <button class="main-button" onclick="openLivestockModal()">
+              <i class="fas fa-plus"></i>
+              Add Livestock
+            </button>
+          </article>
+        </section>
+
+        <!-- Weather -->
+        <section class="section" id="weatherSection">
+          <div class="heading">
+            <h2>Weather & Alerts</h2>
+            <p>Weather information can help you plan irrigation, planting, spraying, and harvesting.</p>
+          </div>
+
+          <article class="feature-card">
+            <h2><i class="fas fa-cloud-sun-rain"></i> Farm Weather</h2>
+            <p>Connect a weather API later to show live rainfall, temperature, humidity, and wind conditions.</p>
+
+            <button class="main-button"
+                    onclick="showToast('Connect a weather API later for live weather information.')">
+              <i class="fas fa-cloud"></i>
+              Check Weather
+            </button>
+          </article>
+        </section>
+
+        <!-- Marketplace -->
+        <section class="section" id="marketSection">
+          <div class="heading">
+            <h2>Farm Marketplace</h2>
+            <p>Create product listings for farm products, livestock, seeds, and other inputs.</p>
+          </div>
+
+          <article class="feature-card">
+            <h2><i class="fas fa-store"></i> Sell a Farm Product</h2>
+            <p>Add a product such as maize, vegetables, fruits, eggs, milk, livestock, or seeds.</p>
+
+            <button class="main-button" onclick="openMarketModal()">
+              <i class="fas fa-plus"></i>
+              Create Listing
+            </button>
+          </article>
+        </section>
+
+        <!-- Farmer Groups -->
+        <section class="section" id="groupsSection">
+          <div class="heading">
+            <h2>Farmer Groups</h2>
+            <p>Create a farmer group and share its code with other farmers.</p>
+          </div>
+
+          <article class="feature-card">
+            <h2><i class="fas fa-users"></i> Create Farmer Group</h2>
+            <p>Create groups such as maize farmers, livestock keepers, vegetable growers, or cooperatives.</p>
+
+            <button class="main-button" onclick="openCreateGroupModal()">
+              <i class="fas fa-plus"></i>
+              Create Group
+            </button>
+          </article>
+
+          <div class="groups-list">
+            <div class="groups-header">
+              <i class="fas fa-users"></i>
+              My Farmer Groups
+            </div>
+
+            <div id="groupsList"></div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <span><strong>AgroFarm System</strong> © 2026</span>
+      <span>Smart Agriculture for Better Farming</span>
+    </footer>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modalTitle">Add Record</h3>
+        <button class="close-modal" onclick="closeModal()">&times;</button>
+      </div>
+
+      <div class="modal-body" id="modalBody"></div>
+
+      <div class="modal-footer" id="modalFooter"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const userFirstName = {{ (user.first_name or "Farmer")|tojson }};
+    const userLastName = {{ (user.last_name or "")|tojson }};
+
+    const sidebar = document.getElementById("sidebar");
+    const profileButton = document.getElementById("profileButton");
+    const profileDropdown = document.getElementById("profileDropdown");
+    const modalOverlay = document.getElementById("modalOverlay");
+    const toast = document.getElementById("toast");
+
+    let farmerGroups = JSON.parse(
+      localStorage.getItem("agroFarmGroups") || "[]"
+    );
+
+    function getInitials() {
+      const first = userFirstName.trim().charAt(0);
+      const last = userLastName.trim().charAt(0);
+
+      return (first + last || "F").toUpperCase();
+    }
+
+    document.getElementById("smallInitials").textContent = getInitials();
+    document.getElementById("largeInitials").textContent = getInitials();
+
+    const descriptions = {
+      dashboardSection: "Manage your essential farm services from one dashboard.",
+      cropsSection: "Plan and monitor crop production activities.",
+      livestockSection: "Manage farm animals and basic livestock records.",
+      weatherSection: "Check weather information and agriculture alerts.",
+      marketSection: "Buy and sell agricultural products and farm inputs.",
+      groupsSection: "Create and manage farmer community groups."
+    };
+
+    function showSection(sectionId) {
+      document.querySelectorAll(".section").forEach(section => {
+        section.classList.toggle("active", section.id === sectionId);
+      });
+
+      document.querySelectorAll(".nav-button").forEach(button => {
+        button.classList.toggle(
+          "active",
+          button.dataset.section === sectionId
+        );
+      });
+
+      const activeButton = document.querySelector(
+        `.nav-button[data-section="${sectionId}"]`
+      );
+
+      const name = activeButton
+        ? activeButton.querySelector("span").textContent
+        : "Agriculture Dashboard";
+
+      document.getElementById("pageTitle").textContent = name;
+      document.getElementById("pageDescription").textContent =
+        descriptions[sectionId];
+
+      sidebar.classList.remove("open");
+      closeProfileMenu();
+
+      if (sectionId === "groupsSection") {
+        renderGroups();
+      }
+    }
+
+    document.querySelectorAll(".nav-button").forEach(button => {
+      button.addEventListener("click", () => {
+        showSection(button.dataset.section);
+      });
+    });
+
+    document.querySelectorAll("[data-section-target]").forEach(card => {
+      card.addEventListener("click", () => {
+        showSection(card.dataset.sectionTarget);
+      });
+    });
+
+    document.getElementById("mobileMenuButton").addEventListener("click", () => {
+      sidebar.classList.toggle("open");
+    });
+
+    document.getElementById("desktopMenuButton").addEventListener("click", () => {
+      sidebar.classList.toggle("open");
+    });
+
+    profileButton.addEventListener("click", event => {
+      event.stopPropagation();
+      profileDropdown.classList.toggle("show");
+    });
+
+    document.addEventListener("click", event => {
+      if (!event.target.closest(".profile-section")) {
+        closeProfileMenu();
+      }
+
+      if (event.target === modalOverlay) {
+        closeModal();
+      }
+    });
+
+    function closeProfileMenu() {
+      profileDropdown.classList.remove("show");
+    }
+
+    function loadTheme() {
+      const theme = localStorage.getItem("agroFarmTheme") || "light";
+      const isDark = theme === "dark";
+
+      document.body.classList.toggle("dark", isDark);
+
+      document.getElementById("themeLabel").textContent =
+        isDark ? "Light Mode" : "Dark Mode";
+    }
+
+    document.getElementById("themeButton").addEventListener("click", () => {
+      const isDark = document.body.classList.toggle("dark");
+
+      localStorage.setItem(
+        "agroFarmTheme",
+        isDark ? "dark" : "light"
+      );
+
+      document.getElementById("themeLabel").textContent =
+        isDark ? "Light Mode" : "Dark Mode";
+
+      closeProfileMenu();
+    });
+
+    document.getElementById("fullscreenButton").addEventListener("click", async () => {
+      try {
+        if (!document.fullscreenElement) {
+          await document.documentElement.requestFullscreen();
+        } else {
+          await document.exitFullscreen();
+        }
+      } catch (error) {
+        showToast("Fullscreen is not supported in your browser.", "error");
+      }
+    });
+
+    document.addEventListener("fullscreenchange", () => {
+      const icon = document.querySelector("#fullscreenButton i");
+
+      icon.className = document.fullscreenElement
+        ? "fas fa-compress"
+        : "fas fa-expand";
+    });
+
+    document.getElementById("logoutButton").addEventListener("click", () => {
+      window.location.href = "/logout";
+    });
+
+    function showToast(message, type = "success") {
+      toast.textContent = message;
+      toast.className = "toast show";
+
+      if (type === "error") {
+        toast.classList.add("error");
+      }
+
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 3000);
+    }
+
+    function openModal(title, bodyHTML, confirmText, onConfirm) {
+      document.getElementById("modalTitle").textContent = title;
+      document.getElementById("modalBody").innerHTML = bodyHTML;
+
+      document.getElementById("modalFooter").innerHTML = `
+        <button class="outline-button" onclick="closeModal()">Cancel</button>
+        <button class="main-button" id="modalConfirmButton">
+          ${confirmText}
+        </button>
+      `;
+
+      document.getElementById("modalConfirmButton").onclick = onConfirm;
+      modalOverlay.classList.add("show");
+    }
+
+    function closeModal() {
+      modalOverlay.classList.remove("show");
+    }
+
+    function openCropModal() {
+      openModal(
+        "Add Crop Plan",
+        `
+          <div class="field">
+            <label for="cropName">Crop name</label>
+            <input id="cropName" placeholder="Example: Maize">
+          </div>
+
+          <div class="field">
+            <label for="plantingDate">Planting date</label>
+            <input id="plantingDate" type="date">
+          </div>
+        `,
+        "Save Crop",
+        () => {
+          const cropName = document.getElementById("cropName").value.trim();
+
+          if (!cropName) {
+            showToast("Enter the crop name.", "error");
+            return;
+          }
+
+          closeModal();
+          showToast(`${cropName} crop plan saved.`);
+        }
+      );
+    }
+
+    function openLivestockModal() {
+      openModal(
+        "Add Livestock Record",
+        `
+          <div class="field">
+            <label for="animalType">Animal type</label>
+            <input id="animalType" placeholder="Example: Cattle, goats, chickens">
+          </div>
+
+          <div class="field">
+            <label for="animalCount">Number of animals</label>
+            <input id="animalCount" type="number" min="1" placeholder="Example: 10">
+          </div>
+        `,
+        "Save Livestock",
+        () => {
+          const animalType = document.getElementById("animalType").value.trim();
+
+          if (!animalType) {
+            showToast("Enter the animal type.", "error");
+            return;
+          }
+
+          closeModal();
+          showToast(`${animalType} livestock record saved.`);
+        }
+      );
+    }
+
+    function openMarketModal() {
+      openModal(
+        "Create Farm Listing",
+        `
+          <div class="field">
+            <label for="productName">Product name</label>
+            <input id="productName" placeholder="Example: Fresh tomatoes">
+          </div>
+
+          <div class="field">
+            <label for="productPrice">Price</label>
+            <input id="productPrice" placeholder="Example: TZS 50,000">
+          </div>
+        `,
+        "Create Listing",
+        () => {
+          const productName = document.getElementById("productName").value.trim();
+
+          if (!productName) {
+            showToast("Enter the product name.", "error");
+            return;
+          }
+
+          closeModal();
+          showToast(`${productName} listing created.`);
+        }
+      );
+    }
+
+    function openCreateGroupModal() {
+      openModal(
+        "Create Farmer Group",
+        `
+          <div class="field">
+            <label for="groupName">Group name</label>
+            <input id="groupName" placeholder="Example: Maize Farmers">
+          </div>
+
+          <div class="field">
+            <label for="groupDescription">Description</label>
+            <textarea id="groupDescription"
+              placeholder="What is this group about?"></textarea>
+          </div>
+        `,
+        "Create Group",
+        () => {
+          const name = document.getElementById("groupName").value.trim();
+          const description = document.getElementById("groupDescription").value.trim();
+
+          if (!name) {
+            showToast("Enter a group name.", "error");
+            return;
+          }
+
+          const code = "AGRO" + Math.floor(1000 + Math.random() * 9000);
+
+          farmerGroups.push({
+            id: Date.now(),
+            name: name,
+            description: description,
+            code: code,
+            members: 1
+          });
+
+          saveGroups();
+          closeModal();
+          showToast(`Group created. Code: ${code}`);
+        }
+      );
+    }
+
+    function saveGroups() {
+      localStorage.setItem("agroFarmGroups", JSON.stringify(farmerGroups));
+      renderGroups();
+    }
+
+    function escapeHtml(text) {
+      return String(text || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function renderGroups() {
+      const groupsList = document.getElementById("groupsList");
+
+      document.getElementById("groupCount").textContent = farmerGroups.length;
+
+      if (farmerGroups.length === 0) {
+        groupsList.innerHTML = `
+          <div class="empty-groups">
+            You have not created a farmer group yet.
+          </div>
+        `;
+        return;
+      }
+
+      groupsList.innerHTML = farmerGroups.map(group => `
+        <div class="group-item">
+          <div class="group-info">
+            <h4>${escapeHtml(group.name)}</h4>
+
+            <p>
+              ${escapeHtml(group.description || "No description")}
+              • ${group.members || 1} member(s)
+            </p>
+
+            <span class="group-code">${escapeHtml(group.code)}</span>
+          </div>
+
+          <button class="outline-button"
+                  onclick="copyGroupCode('${escapeHtml(group.code)}')">
+            <i class="fas fa-copy"></i>
+            Copy
+          </button>
+        </div>
+      `).join("");
+    }
+
+    async function copyGroupCode(code) {
+      try {
+        await navigator.clipboard.writeText(code);
+        showToast(`Group code ${code} copied.`);
+      } catch (error) {
+        showToast("Could not copy the group code.", "error");
+      }
+    }
+
+    loadTheme();
+    renderGroups();
+  </script>
+</body>
+</html>
