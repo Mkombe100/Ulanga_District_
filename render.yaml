@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: ulanga-district
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: DATABASE_URL
+        scope: run
+      - key: SECRET_KEY
+        generateValue: true
+      - key: EMAIL_USER
+        scope: run
+      - key: EMAIL_PASS
+        scope: run
+      - key: EMAIL_FROM_NAME
+        value: Ulanga District System
